@@ -6,15 +6,16 @@
     <title>Unit 5 Assignment</title>
 </head>
 <body>
-<script data-main="js/app.js">
+<script>
 
-
+//Unit 5 Assignment: Working with Files
+//*********************************************************
 //****Assignment 5 Section 1
 //*********************************************************
-
-var produceList = []; 
+// create an arraylist, named produceList, to hold the data
+var produceList = []; // create empty array using the [] array literal
 var producePrices = [];
-
+//add data to the produce list
 produceList.push("bananas 0.59");
 produceList.push("grapes 2.99");
 produceList.push("apples 1.49");
@@ -23,57 +24,82 @@ produceList.push("lettuce 0.99");
 produceList.push("onions 0.79");
 produceList.push("potatoes 0.59");
 produceList.push("peaches 1.59");
-
+// open a file, called ProducePrice.txt
+//use a for loop to Write the data to a file, called ProducePrice.
+// define a File System module for more see: https://www.w3schools.com/nodejs/nodejs_modules.asp
 var filestream = require('fs');
-
+//use the file system module's openSync method to open the file for synchronous writing and set a
+//file descriptor for the open file.
 var fileDesc = filestream.openSync("ProducePrice.txt",'w+');
 var myRecord = "string to hold record";
-
 for (var i=0; i< produceList.length - 1; i++)
-    {
-        myRecord = produceList[i]+"\r";
-        filestream.writeSync(fileDesc, myRecord);
-    }
-
-filestream.writeSync(fileDesc, produceList[i]);
-
+{
+//using string variable to package the record and line return neatly
+myRecord = produceList[i]+"\r";
+//using writeSync method to synchronously write a record to the file. In JavaScript
+//we more often
+//want to do tasks like this asynchronously but in this program we will be
+//immediately opening the
+//file for reading and we have to be sure the writes are done. This could also be
+//accomplished
+//through callback functions but that is a more advanced JavaScript topic.
+filestream.writeSync(fileDesc, myRecord);
+}
+//we will write the last record separately so we can leave off the return character \r
+//if not we will have a blank record at the end of the file.
+//we could have done this inside the loop with an IF statement but that is far more processing
+//overhead to check the condition with every iteration.
+filestream.writeSync(fileDesc, produceList[i]);//last record without line return.
+//close the file
 filestream.closeSync(fileDesc);
-
+//write a function, FileLineCount()
+//that will return the number of lines in a file
+//using the function call, display the number of items in the file.
+//"There are xx products in the file."
+//see function definition at the bottom of this program
 console.log("There are " + FileLineCount("ProducePrice.txt") + " products in the file.");
 console.log();
-
 //*********************************************************
 //****Assignment 5 Section 2
 //*********************************************************
-
+// add four more items to the file
+//with node.js's fs.appendFileSync we can write a record without explicitely opening the file
+//however, if a large number of writes were needed, opening the file explicitely would likely
+//require far less overhead.
+//last item in the file does not have a line return character so we need to start our first
+//write with a \r
 filestream.appendFileSync('ProducePrice.txt', '\rpeppers 0.99\r');
 filestream.appendFileSync('ProducePrice.txt', 'celery 1.29\r');
 filestream.appendFileSync('ProducePrice.txt', 'cabbage 0.79\r');
-filestream.appendFileSync('ProducePrice.txt', 'tomatoes 1.19'); 
+filestream.appendFileSync('ProducePrice.txt', 'tomatoes 1.19'); // leave off \r for last record
+//display the number of items in the produce file now
 console.log("There are " + FileLineCount("ProducePrice.txt") + " products in the file.\n");
-
 //*********************************************************
 //****Assignment 5 Section 3
 //*********************************************************
-
+//read the contents of the file ProducePrice.txt into a new arraylist called producePrices
+//we've aready done this in the function below to count the number of records.
 producePrices = filestream.readFileSync("ProducePrice.txt").toString().split("\r");
-
-var lineCounter = 0; 
+var lineCounter = 0; //used to number the lines written to the console and control the loop
 while (lineCounter < producePrices.length)
 {
-    console.log((lineCounter+1) + ". " + producePrices[lineCounter]);
-    lineCounter++;
+console.log((lineCounter+1) + ". " + producePrices[lineCounter]);
+lineCounter++;
 }
-
 console.log("\nThere are " + producePrices.length + " products in the producePrices arraylist.");
-
+//function FileLineCount accepts string value of file name and returns count of items in file
 function FileLineCount(fileName)
 {
-    var tempList = [];
-    var fs = require('fs');
-
-    tempList = fs.readFileSync(fileName).toString().split("\r");
-    return tempList.length;
+var tempList = [];
+//define a new file system module so this function can be indepent of any calling code.
+var fs = require('fs');
+//the file system module's readFileSync method does not require us to open the file first.
+//using the toString and .split methods we can easily parse the file into separate array
+//elements doing so gives us a means for obtaining the record count without a loop. For
+//very large files this might not be memory efficient. An asynchronous method with a
+//callback function might be a better choice
+tempList = fs.readFileSync(fileName).toString().split("\r");
+return tempList.length;
 }
 
 </script>   
